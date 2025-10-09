@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import Tflite from 'tflite-react-native';
+import { captureRef } from 'react-native-view-shot'; // to snapshot WebView feed
+import { Buffer } from 'buffer';
+import { useRef } from 'react';
 import { 
   View, 
   Text, 
