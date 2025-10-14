@@ -85,7 +85,80 @@ export default function GameScreen({ user, onBack }) {
       );
     }
   };
+  
+// 🧠 === ML SECTION START ===
+import React, { useState, useEffect, useRef } from 'react';
+import Tflite from 'tflite-react-native';
+import ViewShot from 'react-native-view-shot';
+import RNFS from 'react-native-fs';
+import { WebView } from 'react-native-webview';
 
+const tflite = new Tflite();
+
+useEffect(() => {
+  // Load model once on mount
+  tflite.loadModel(
+    {
+      model: 'models/best_float32.tflite', // inside android/app/src/main/assets/models
+      labels: 'models/labels.txt',
+    },
+    (err, res) => {
+      if (err) console.log('❌ Model load error:', err);
+      else console.log('✅ Model loaded successfully:', res);
+    }
+  );
+}, []);
+
+const [result, setResult] = useState(null);
+
+const webViewRef = useRef(null);
+const viewShotRef = useRef(null);
+
+// Capture frame and analyze it
+const analyzeFrame = async (frameUri) => {
+  tflite.runModelOnImage(
+    {
+      path: frameUri,
+      imageMean: 128.0,
+      imageStd: 128.0,
+      numResults: 4,
+      threshold: 0.1,
+    },
+    (err, res) => {
+      if (err) return console.log('⚠️ Inference error:', err);
+      if (!res || res.length === 0) return console.log('⚠️ No prediction received');
+      console.log('🧩 Prediction:', res);
+
+      setResult(res);
+
+      const label = res[0].label.toLowerCase();
+      if (label.includes('left')) sendCommandToCar('LEFT');
+      else if (label.includes('right')) sendCommandToCar('RIGHT');
+      else if (label.includes('forward')) sendCommandToCar('FORWARD');
+      else if (label.includes('stop')) sendCommandToCar('STOP');
+    }
+  );
+};
+
+// Capture screenshot of WebView every 2s and analyze
+const captureAndAnalyze = async () => {
+  try {
+    const uri = await viewShotRef.current.capture();
+    console.log('📸 Captured frame:', uri);
+    await analyzeFrame(uri);
+  } catch (err) {
+    console.log('❌ Frame capture error:', err);
+  }
+};
+
+useEffect(() => {
+  const interval = setInterval(captureAndAnalyze, 2000);
+  return () => clearInterval(interval);
+}, []);
+
+// 🧠 === ML SECTION END ===
+
+  
   const sendCommandToESP32 = async (command) => {
     // if (!isConnected) {
     //   Alert.alert('Not Connected', 'Please check ESP32 connection');
