@@ -1,0 +1,131 @@
+╔══════════════════════════════════════════════════════════════╗
+║         🎯 ARROW DETECTION - QUICK REFERENCE                 ║
+╚══════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────┐
+│  🚀 FASTEST START (Recommended)                             │
+└─────────────────────────────────────────────────────────────┘
+
+  Windows:  Double-click START_DETECTION.bat
+  Manual:   python start_detection.py
+
+  ✅ Automatic ESP32 initialization
+  ✅ Camera health checks
+  ✅ Retry logic built-in
+  ✅ Software reset option
+
+┌─────────────────────────────────────────────────────────────┐
+│  📋 SYSTEM ENDPOINTS                                        │
+└─────────────────────────────────────────────────────────────┘
+
+  ESP32 Base:      http://10.166.128.220
+  Camera Stream:   http://10.166.128.220:81/stream
+  WebSocket:       ws://10.166.128.118:8765
+  
+  ESP32 Controls:
+    → /forward     - Move forward
+    → /backward    - Move backward  
+    → /left        - Turn left
+    → /right       - Turn right
+    → /stop        - Stop motors
+    → /reset       - Software reset (NEW!)
+    → /health      - Check camera status (NEW!)
+    → /heap        - Memory diagnostics
+
+┌─────────────────────────────────────────────────────────────┐
+│  🔧 TROUBLESHOOTING                                         │
+└─────────────────────────────────────────────────────────────┘
+
+  Problem: Black screen in app
+  Solution: Rebuild Android app after manifest changes
+            cd android && ./gradlew clean
+            npx react-native run-android
+
+  Problem: Camera not responding
+  Solution 1: Software reset
+              curl http://10.166.128.220/reset
+  Solution 2: Physical RESET button on ESP32-CAM
+  
+  Problem: Cannot connect to ESP32
+  Solution: Check WiFi (both on same network)
+            Verify IP: ping 10.166.128.220
+            
+  Problem: Low FPS / Laggy stream
+  Solution: Edit arrow_det_fixed.py
+            PROCESS_EVERY_N_FRAMES = 3  # Increase
+            Or reduce ESP32 frame size to QVGA
+
+┌─────────────────────────────────────────────────────────────┐
+│  📊 PERFORMANCE METRICS                                     │
+└─────────────────────────────────────────────────────────────┘
+
+  Target FPS:          15-20 FPS
+  Inference Time:      ~50ms
+  Latency:            150ms (total)
+  Confirmation:       2 frames (~40ms)
+  Cooldown:           3 frames (~60ms)
+
+┌─────────────────────────────────────────────────────────────┐
+│  🎮 DIRECTION MAPPING                                       │
+└─────────────────────────────────────────────────────────────┘
+
+  Arrow Detected  →  Command Sent  →  ESP32 Action
+  ────────────────────────────────────────────────
+  LEFT            →  left          →  Turn Left
+  RIGHT           →  right         →  Turn Right
+  UP              →  forward       →  Move Forward
+  DOWN            →  backward      →  Move Backward
+
+┌─────────────────────────────────────────────────────────────┐
+│  📱 REACT NATIVE APP                                        │
+└─────────────────────────────────────────────────────────────┘
+
+  Run App:         npx react-native run-android
+  Rebuild:         cd android && ./gradlew clean && cd ..
+  
+  Components:
+    ✅ WebView for MJPEG stream (not Image!)
+    ✅ WebSocket auto-reconnect
+    ✅ Manual controls + AI control
+    ✅ Live camera feed with overlays
+
+┌─────────────────────────────────────────────────────────────┐
+│  📁 KEY FILES                                               │
+└─────────────────────────────────────────────────────────────┘
+
+  ESP32 Code:      CameraWebServer.ino
+  Detection:       ML/arrow_det_fixed.py
+  Quick Start:     ML/start_detection.py
+  Windows Start:   ML/START_DETECTION.bat
+  App Screen:      screens/GameScreen.js
+  
+  Model:           ML/best_float32 (Detect).tflite
+  Config:          android/.../network_security_config.xml
+
+┌─────────────────────────────────────────────────────────────┐
+│  ⚡ WHAT'S NEW (Instant Startup)                           │
+└─────────────────────────────────────────────────────────────┘
+
+  ✨ No more manual RESET button pressing!
+  ✨ Automatic ESP32 initialization
+  ✨ Software reset endpoint (/reset)
+  ✨ Camera health monitoring (/health)
+  ✨ Smart retry logic (5 attempts)
+  ✨ Frame capture testing
+  ✨ 2-second warmup period
+  ✨ One-click startup script
+
+┌─────────────────────────────────────────────────────────────┐
+│  💡 PRO TIPS                                                │
+└─────────────────────────────────────────────────────────────┘
+
+  1. Use START_DETECTION.bat for easiest start
+  2. Software reset is faster than physical button
+  3. Check /health endpoint to verify camera ready
+  4. Increase PROCESS_EVERY_N_FRAMES if CPU struggles
+  5. WebView (not Image!) required for MJPEG streams
+  6. Android needs network_security_config for HTTP
+
+═══════════════════════════════════════════════════════════════
+  Need help? Check INSTANT_STARTUP.md for detailed guide
+═══════════════════════════════════════════════════════════════
